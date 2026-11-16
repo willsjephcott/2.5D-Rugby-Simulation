@@ -20,10 +20,21 @@ public class KickOffResetter : MonoBehaviour
         ResetAllPlayerStates();
         kickoffManager.PositionTeamsForKickoff();
         kickoffManager.GiveBallToFirstAttacker();
+        RestoreHumanControl();
         ScoreManager.Instance?.ResetPhase();
         FindAnyObjectByType<ConversionResultUI>()?.Hide();
     }
 
+
+    // ResetTeam hands every player to the AI; without this the team that just scored is left with no controlled player
+    private void RestoreHumanControl()
+    {
+        TeamInputHandler[] handlers = FindObjectsByType<TeamInputHandler>(FindObjectsSortMode.None);
+        foreach (TeamInputHandler handler in handlers)
+        {
+            handler.ReclaimControl();
+        }
+    }
 
     private void ResetAllPlayerStates()
     {

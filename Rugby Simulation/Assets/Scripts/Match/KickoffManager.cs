@@ -11,6 +11,8 @@ public class KickoffManager : MonoBehaviour
     public float defensiveLineOffset = 10f;
     public float playerSpacing = 2f;
     public float groundY = 0f;
+    // Small gap left under a player's collider when placed, so they settle onto the pitch instead of starting inside it
+    public float groundClearance = 0.02f;
     public Vector3 kickoffCentre = Vector3.zero;
 
     private void Start()
@@ -32,8 +34,14 @@ public class KickoffManager : MonoBehaviour
     {
         if (!ValidateTeams()) return;
 
+        // Collider bounds are read while placing players, so make sure physics matches the transforms first
+        Physics.SyncTransforms();
+
         PositionAttackingTeam();
         PositionDefendingTeam();
+
+        // Push the new positions into physics straight away so nothing reads a stale position this frame
+        Physics.SyncTransforms();
     }
     public void StartSecondHalf()
     {
@@ -93,8 +101,24 @@ public class KickoffManager : MonoBehaviour
     }
     private void ApplyPlayerPosition(Player player, Vector3 position)
     {
+        // position.y is ground level. The player's pivot sits at the centre of their collider, so placing the pivot
+        // on the ground buries half the collider in the pitch (a one-sided mesh) and the player can drop through it.
+        position.y += CalculateStandingHeight(player);
+
         player.transform.position = position;
+        if (player.rb != null) player.rb.position = position;
         ZeroPlayerVelocity(player);
+    }
+    // Height of the player's pivot above the bottom of their collider
+    private float CalculateStandingHeight(Player player)
+    {
+        Collider col = player.GetComponent<Collider>();
+        if (col == null || !col.enabled) return 0f;
+
+        Bounds bounds = col.bounds;
+        if (bounds.size.sqrMagnitude <= 0f) return 0f;
+
+        return (player.transform.position.y - bounds.min.y) + groundClearance;
     }
     private void ZeroPlayerVelocity(Player player)
     {
@@ -102,6 +126,8 @@ public class KickoffManager : MonoBehaviour
 
         player.rb.linearVelocity = Vector3.zero;
         player.rb.angularVelocity = Vector3.zero;
+        // Players fall asleep while standing still during the conversion / score screen
+        player.rb.WakeUp();
     }
     public void GiveBallToFirstAttacker()
     {

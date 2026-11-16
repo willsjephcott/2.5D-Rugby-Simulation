@@ -132,21 +132,19 @@ public class ScoreScreenUI : MonoBehaviour
         HideScoreScreen();
 
         Debug.Log($"2. About to reset - Time.timeScale={Time.timeScale}");
-        kickoffResetter?.ResetToKickoff(lastScoringTeam);
-
-        Debug.Log($"3. About to resume - Time.timeScale={Time.timeScale}");
-        ResumeGame();
-
-        Debug.Log($"4. Done - Time.timeScale={Time.timeScale}");
-
         if (kickoffResetter != null)
         {
-            kickoffResetter.ResetToKickoff();
+            kickoffResetter.ResetToKickoff(lastScoringTeam);
         }
         else
         {
             Debug.LogWarning("ScoreScreenUI: KickoffResetter not assigned.");
         }
+
+        Debug.Log($"3. About to resume - Time.timeScale={Time.timeScale}");
+        ResumeGame();
+
+        Debug.Log($"4. Done - Time.timeScale={Time.timeScale}");
     }
 
 }

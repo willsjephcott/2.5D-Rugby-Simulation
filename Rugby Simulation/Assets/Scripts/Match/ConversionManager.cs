@@ -43,6 +43,8 @@ public class ConversionManager : IContest
         if (!ValidateKicker()) return;
 
         Vector3 kickPos = CalculateKickerPosition();
+        // tryPosition comes from the ball (held above the carrier), so keep the kicker at their own height
+        kickPos.y = kicker.rb.position.y;
         kicker.rb.MovePosition(kickPos);
         kicker.SetControlled(false);
         kicker.stateMachine.SM.SetState(new AIIdleState(kicker.stateMachine));

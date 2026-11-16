@@ -83,6 +83,14 @@ public class TeamInputHandler : MonoBehaviour
         initialPlayerSet = true;
     }
 
+    // Called after a kickoff reset, which hands every player back to the AI
+    public void ReclaimControl()
+    {
+        if (!initialPlayerSet) return;
+        if (!ValidateTeamHasPlayers()) return;
+        SetControlledPlayer(ClampPlayerIndex(currentPlayerIndex));
+    }
+
     private void ProcessMovementInput(Player player)
     {
         Vector2 moveInput = ReadMoveInput();

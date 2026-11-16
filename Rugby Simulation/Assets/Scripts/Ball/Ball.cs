@@ -1,6 +1,5 @@
 using UnityEngine;
 using System;
-using UnityEditor.Experimental.GraphView;
 
 public class Ball : MonoBehaviour
 {
@@ -119,10 +118,14 @@ public class Ball : MonoBehaviour
     {
         if (!ValidateHolder(holder)) return;
 
+        // A pass still in flight would carry the ball away from the new holder
+        if (IsBeingPassed()) passHandler.CancelPass();
+
+        Transform previousHolder = currentHolder;
         Transform playerRoot = FindPlayerRoot(holder);
         currentHolder = playerRoot;
         rb.isKinematic = true;
-        NotifyOwnershipChange(currentHolder, playerRoot);
+        NotifyOwnershipChange(previousHolder, playerRoot);
     }
     public void Drop()
     {

@@ -56,6 +56,11 @@ public class PassHandler : MonoBehaviour
     {
         return isPassing;
     }
+    // Stops a pass mid-flight (e.g. a conversion kick still in the air when play resets to kickoff)
+    public void CancelPass()
+    {
+        isPassing = false;
+    }
     public void ForcePassToTarget(Transform target)
     {
         if (target == null) return;
